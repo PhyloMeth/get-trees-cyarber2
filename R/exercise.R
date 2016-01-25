@@ -10,14 +10,15 @@ GetFromTreeBase_exercise <- function() {
 	# Replace the "__________" with appropriate arguments
 	# When you run this, it'll take some time. But less time than sequencing
 	# and building the tree yourself.
-	trees <- search_treebase(input="__________", by="__________", 
-	branch_lengths="__________")
+	library("treebase")
+	trees <- search_treebase(input="Formica", by="taxon", 
+	branch_lengths=TRUE)
 	
 	# Pull out just the biggest tree (for convenience)
 	biggest.tree <- trees[[which.max(sapply(trees, Ntip))]]
 	
 	# Print out a description of the biggest tree
-	print("__________")
+	print(biggest_tree)
 	
 	# Let's look at the TreeBASE page for this study
 	browseURL(paste(
@@ -41,14 +42,16 @@ GetTreeFromOpenTree_exercise <- function() {
 
 	# Replace the "__________" with appropriate arguments
 	
-	anolis.id <- tnrs_match_names("__________")$ott_id
+	library(rotl)
+	anolis.id <- tnrs_match_names(names = "Anolis")$ott_id
 	
 	# Now get Open Tree's current best estimate of the phylogeny for the group
 	# They call this the tree of life; we can get the subtree for just this group.
-	anolis.tree <- tol_subtree(ott_id=anolis.id)
+	anolis.tree <- tol_subtree(ott_id = anolis.id)
 	
 	# Let's plot the tree:
-	plot.phylo("__________", type="fan", cex=0.2)
+	library(ape)
+	plot.phylo(anolis.tree, type="fan", cex=0.2)
 	
 	# It has a lot of polytomies, representing uncertainty. A maximally resolved
 	# tree (if rooted) will have one fewer internal nodes than terminal nodes:
@@ -60,7 +63,7 @@ GetTreeFromOpenTree_exercise <- function() {
 	# node that must always exist)
 	
 	print(paste("The Anolis tree has ", Ntip(anolis.tree), " terminals and ", 
-	Nnode(anolis.tree), " internal nodes out of ",Ntip(anolis.tree)-2,
+	Nnode(anolis.tree), " internal nodes out of ", Ntip(anolis.tree)-2 ,
 	" possible, which means it is ", 
 	round(100*(Nnode(anolis.tree)-1)/(Ntip(anolis.tree)-3), 2),
 	"% resolved", sep=""))
@@ -68,19 +71,19 @@ GetTreeFromOpenTree_exercise <- function() {
 	# Open Tree can also return the original studies with the source trees.
 	anolis.studies <- studies_find_studies(property="ot:focalCladeOTTTaxonName",
 	value="Anolis")
-	anolis.studies.ids <- unlist(anolis.studies$matched_studies)
 	
 	# Let's get info on the first study
-	anolis.study1.metadata <- get_study_meta(anolis.studies[[1]][[1]]$`ot:studyId`)
+	anolis.study1.metadata <- get_study_meta(anolis.studies$study_ids)
 	print(get_publication(anolis.study1.metadata))
 	
 	# And let's get the tree from this study
 	# Look in rotl documentation for the right function
 	# Hint: get_study_trees() is close, but you don't know the tree.id
-	anolis.study1.tree1 <- get_______FUNCTION_FROM_rotl____(anolis.studies.ids[[1]])
+	tree.ids <- get_tree_ids(anolis.study1.metadata)
+	anolis.study1.tree1 <- get_study_tree(study_id=anolis.studies$study_ids, tree_id="tree6680")
 	
 	# And plot it
-	plot.phylo(anolis.study1.tree1, type="fan", cex=0.2)
+	plot.phylo(anolis.study1.tree1, cex=0.2)
 	
 	#Return both trees
 	return.list <- list(anolis.tree, anolis.study1.tree1)
